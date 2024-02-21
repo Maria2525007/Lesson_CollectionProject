@@ -37,7 +37,7 @@ public class StudentSurnameStorage {
         System.out.println(surnamesTreeMap.keySet());
     }
 
-    public String[] getSearchByCommand(String[] surnames) {
+    public Set<Long> getSearchByCommand(String[] surnames) {
         String surname1 = surnames[0].trim();
         String surname2 = surnames[1].trim();
         if (surname1.compareTo(surname2) > 0) {
@@ -45,9 +45,12 @@ public class StudentSurnameStorage {
             surname1 = surname2;
             surname2 = temp;
         }
-        return surnamesTreeMap.subMap(surname1, true, surname2, true)
-                .keySet()
-                .toArray(String[]::new);
+        return surnamesTreeMap.headMap(surname1, true)
+                .tailMap(surname2, true)
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
 

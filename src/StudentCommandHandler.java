@@ -100,15 +100,15 @@ public class StudentCommandHandler {
             studentStorage.printMap(data);
         }
     private void processSearchByCommand(Command command) {
-        String data = command.getData().trim();
-        if (data.isEmpty()) {
+        String data = command.getData();
+        if (data == null) {
             studentSurnameStorage.printAllSurnames();
         } else if (data.contains(",")) {
-            String[] surnames = data.split(",");
+            String[] surnames = data.replaceAll(" ", "").split(",");
             if (surnames.length == 2) {
-                String[] foundSurnames = studentSurnameStorage.getSearchByCommand(surnames);
-                if (foundSurnames.length > 0) {
-                    System.out.println(Arrays.toString(foundSurnames));
+                Set<Long> foundSurnames = studentSurnameStorage.getSearchByCommand(surnames);
+                if (foundSurnames.size() > 0) {
+                    System.out.println(foundSurnames);
                 } else {
                     System.out.println("Студенты с такими фамилиями не найдены.");
                 }

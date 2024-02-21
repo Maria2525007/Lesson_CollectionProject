@@ -37,6 +37,7 @@ public class Validator {
         try {
             Long.parseLong(id);
         } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
             return false;
         }
         return true;

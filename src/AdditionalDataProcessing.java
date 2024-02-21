@@ -2,14 +2,24 @@ public class AdditionalDataProcessing {
 
     public static String[] processDataForCreate(Command command)
                                         throws ArrayIndexOutOfBoundsException, NumberFormatException{
-            String[] res = command.getData().replace(" ", "").split(",");
-            Validator.validateData(res);
+            String[] res = command.getData().replaceAll(" ", "").split(",");
+            if (res.length != 5) {
+                throw new ArrayIndexOutOfBoundsException();
+            }
+            else {
+                Validator.validateData(res);
+            }
             return res;
     }
 
     public static String[] processDataForUpdate(Command command) throws NumberFormatException, ArrayIndexOutOfBoundsException {
-        String[] res = command.getData().replace(" ", "").split(",");
-        Validator.validateData(res);
+        String[] res = command.getData().replaceAll(" ", "").split(",");
+        if (res.length != 6) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        else {
+            Validator.validateData(res);
+        }
         return res;
     }
 
