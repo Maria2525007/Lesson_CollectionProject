@@ -2,10 +2,9 @@ import java.rmi.StubNotFoundException;
 import java.util.*;
 
 public class StudentCommandHandler {
-
-    private final StudentStorage studentStorage = new StudentStorage();
-
     private final StudentSurnameStorage studentSurnameStorage = new StudentSurnameStorage();
+    private final StudentStorage studentStorage = new StudentStorage(studentSurnameStorage);
+
     public void processCreateCommand(Command command) {
         try {
             String[] dataArray = AdditionalDataProcessing.processDataForCreate(command);
@@ -18,11 +17,9 @@ public class StudentCommandHandler {
             studentStorage.createStudent(student);
             AdditionalDataProcessing.printMessage(command);
             studentStorage.printAll();
-        }
-        catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println(e.getMessage());
-        }
-        catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
 
@@ -51,75 +48,78 @@ public class StudentCommandHandler {
             System.out.println(e.getMessage(id));
         }
     }
-        private void processDeleteCommand (Command command){
-            String data = command.getData();
-            Long id = Long.valueOf(data);
-            studentStorage.deleteStudent(id);
-            AdditionalDataProcessing.printMessage(command);
-            studentStorage.printAll();
-        }
-        public void processCommand (Command command){
-            Action action = command.getAction();
-            switch (action) {
-                case CREATE: {
-                    processCreateCommand(command);
-                    break;
-                }
-                case UPDATE: {
-                    processUpdateCommand(command);
-                    break;
-                }
-                case DELETE: {
-                    processDeleteCommand(command);
-                    break;
-                }
-                case STATS_BY_STUDENTS: {
-                    processStatsByCoursesCommand();
-                    break;
-                }
-                case STATS_BY_CITIES: {
-                    processStatsByCitiesCommand();
-                    break;
-                }
-                case SEARCH: {
-                    processSearchByCommand(command);
-                    break;
-                }
-                default: {
-                    System.out.println("Unknown action: " + action);
-                }
-            }
 
+    private void processDeleteCommand(Command command) {
+        String data = command.getData();
+        Long id = Long.valueOf(data);
+        studentStorage.deleteStudent(id);
+        AdditionalDataProcessing.printMessage(command);
+        studentStorage.printAll();
+    }
+
+    public void processCommand(Command command) {
+        Action action = command.getAction();
+        switch (action) {
+            case CREATE: {
+                processCreateCommand(command);
+                break;
+            }
+            case UPDATE: {
+                processUpdateCommand(command);
+                break;
+            }
+            case DELETE: {
+                processDeleteCommand(command);
+                break;
+            }
+            case STATS_BY_STUDENTS: {
+                processStatsByCoursesCommand();
+                break;
+            }
+            case STATS_BY_CITIES: {
+                processStatsByCitiesCommand();
+                break;
+            }
+            case SEARCH: {
+                processSearchByCommand(command);
+                break;
+            }
+            default: {
+                System.out.println("Unknown action: " + action);
+            }
         }
-        private void processStatsByCoursesCommand() {
-            Map<String, Long> data = studentStorage.getCountByCourse();
-            studentStorage.printMap(data);
-        }
-        private void processStatsByCitiesCommand () {
-            Map<String, Long> data = studentStorage.getCountByCities();
-            studentStorage.printMap(data);
-        }
+
+    }
+
+    private void processStatsByCoursesCommand() {
+        Map<String, Long> data = studentStorage.getCountByCourse();
+        studentStorage.printMap(data);
+    }
+
+    private void processStatsByCitiesCommand() {
+        Map<String, Long> data = studentStorage.getCountByCities();
+        studentStorage.printMap(data);
+    }
+
     private void processSearchByCommand(Command command) {
         String data = command.getData();
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             studentSurnameStorage.printAllSurnames();
         } else if (data.contains(",")) {
             String[] surnames = data.replaceAll(" ", "").split(",");
             if (surnames.length == 2) {
-                Set<Long> foundSurnames = studentSurnameStorage.getSearchByCommand(surnames);
-                if (foundSurnames.size() > 0) {
+                Set<String> foundSurnames = studentSurnameStorage.getSearchByCommand(surnames);
+                if (!foundSurnames.isEmpty()) {
                     System.out.println(foundSurnames);
                 } else {
-                    System.out.println("Студенты с такими фамилиями не найдены.");
+                    System.out.println("No students with entered surnames were found");
                 }
             }
         } else {
-            Set<Long> foundIds = studentSurnameStorage.getSurnamesLessOrEqualThan(data);
-            if (foundIds.size() > 0) {
-                System.out.println(studentSurnameStorage);
-            } else {
-                System.out.println("Студенты с такой фамилией не найдены.");
+            Set<String> foundIds = studentSurnameStorage.getSurnamesLessOrEqualThan(data);
+            if (foundIds != null) {
+                System.out.println(foundIds);
             }
         }
     }
-    }
+}
